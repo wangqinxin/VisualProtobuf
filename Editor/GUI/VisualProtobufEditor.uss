@@ -1,0 +1,7 @@
+.unity-foldout__toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    margin-right: 0px;
+}
+
+.unity-toolbar-button:active {
+    background-color: rgb(70, 96, 124);
+}

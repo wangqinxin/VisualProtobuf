@@ -1,0 +1,16 @@
+{
+    "name": "VisualProtobuf.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:03f5a4c093e1940d496b139d3e713b55"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

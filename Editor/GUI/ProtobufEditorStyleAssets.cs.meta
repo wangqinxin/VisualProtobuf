@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: dd4b9ba3534cc463c9d7dc30d6063d54
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_IconProtobufFile: {fileID: 2800000, guid: a5b87d307d1ed4786a32503a73b32a6c, type: 3}
+  - m_IconMessageType: {fileID: 2800000, guid: a7f0bb205201743bcb855b33641dad8a, type: 3}
+  - m_IconInstance: {fileID: 2800000, guid: d20c1e054611140b4a19e500f400119e, type: 3}
+  - m_IconInstanceVariant: {fileID: 2800000, guid: c5577a4f8412343bdbc1e23f332d431a, type: 3}
+  - m_IconAdd: {instanceID: 0}
+  - m_IconDelete: {fileID: 2800000, guid: 4ad7d69d36d1c4c25a23fcee848c8ad1, type: 3}
+  - m_IconRefresh: {fileID: 2800000, guid: 074cd79a517af4a52aa214f66f46a843, type: 3}
+  - m_IconFolder: {instanceID: 0}
+  - m_IconFolderEmpty: {instanceID: 0}
+  - m_IconFolderOpened: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

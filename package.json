@@ -1,0 +1,14 @@
+{
+  "name": "com.unity.visualprotobuf",
+  "displayName": "Visual Protobuf",
+  "version": "1.0.0",
+  "unity": "2022.2",
+  "description": "Unity package for edit protobuf message visually.",
+  "keywords": [
+    "protobuf"
+  ],
+  "dependencies": {
+    "com.unity.protobuf": "1.0.0",
+    "com.unity.editorcoroutines": "1.0.0"
+  }
+}

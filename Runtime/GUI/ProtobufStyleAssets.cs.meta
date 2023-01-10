@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 669a63f61416b4bf09c4abb9c6e4d04b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Icon_ProtobufFile: {fileID: 2800000, guid: a5b87d307d1ed4786a32503a73b32a6c, type: 3}
+  - Icon_MessageType: {fileID: 2800000, guid: a7f0bb205201743bcb855b33641dad8a, type: 3}
+  - Icon_ProtobufMessage: {fileID: 2800000, guid: d20c1e054611140b4a19e500f400119e, type: 3}
+  - Icon_ProtobufMessageVariant: {fileID: 2800000, guid: c5577a4f8412343bdbc1e23f332d431a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
