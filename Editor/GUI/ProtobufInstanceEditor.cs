@@ -14,6 +14,8 @@ namespace VisualProtobuf.UIElements
     [CustomEditor(typeof(ProtobufInstance))]
     public class ProtobufInstanceEditor : Editor
     {
+        public StyleSheet protobufInstanceEditorStyleSheet;
+
         SerializedProperty foldOutAll;
         SerializedProperty selectedLanguages;
         SerializedProperty autoSave;
@@ -125,9 +127,10 @@ namespace VisualProtobuf.UIElements
                 if (msgDesc != null)
                 {
                     using var jsonReader = System.IO.File.OpenText(m_Instance.fsPath);
-                    var msg = new DynamicMessage(msgDesc);
-                    msg.ParseJson(jsonReader);
-                    m_InspectorRoot.Add(new InstanceField(msg));
+                    var msg = ProtobufDatabase.CreateMessage(msgDesc,jsonReader);
+                    var instanceField = new InstanceField(msg);
+                    instanceField.styleSheets.Add(protobufInstanceEditorStyleSheet);
+                    m_InspectorRoot.Add(instanceField);
                 }
                 else
                 {
@@ -148,7 +151,6 @@ namespace VisualProtobuf.UIElements
             {
                 var dropdown = new ProtobufMessageDropdown(new AdvancedDropdownState(), (messageType) =>
                 {
-                    Debug.LogError("Select MessageType:" + messageType);
                     m_Instance.SetMessageType(messageType);
                     DrawInspectorGUI();
                     Repaint();

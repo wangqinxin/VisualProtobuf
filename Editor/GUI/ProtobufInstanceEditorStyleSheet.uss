@@ -1,0 +1,114 @@
+.instnce_field {
+    margin-left: -15px;
+    padding-left: 15px;
+}
+
+.bool_field {
+
+}
+
+.bool_field__input{
+    border-width: 1px 0px 1px 0px;
+    padding-top: 1px;
+    flex-direction: row;
+    flex-basis: auto;
+}
+
+.bool_field__checkmark{
+    padding-top: 0px;
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    align-self: center;
+    background-image: resource('uipackageresources/images/d_toggle_bg.png');
+}
+
+.bool_field__input:checked > .bool_field__checkmark{
+    background-image: resource('uipackageresources/images/d_toggle_on.png');
+}
+
+.message_field {
+    margin-left: 3px;
+    margin-right: 0px;
+    padding-right: 0px;
+    overflow: visible;
+}
+
+.message_field_header {
+    margin: 0px;
+    overflow: visible;
+}
+
+.message_field_header__label {
+    align-self: center;
+}
+
+.message_field_container{
+    flex-direction: column;
+    padding-left: 12px;
+}
+
+.message_field_header > .unity-base-field__input {
+    flex-direction: row;
+    flex-basis: auto;
+}
+
+.message_field_header__notnull1 {
+    background-color: rgba(75, 75, 75, 100);
+}
+
+.message_field_header__notnull:checked {
+    background-color: rgba(75, 75, 75, 100);
+}
+
+.message_field_header__notnull > .unity-base-field__input {
+    margin-left: -16px;
+}
+
+.message_field_header__notnull > .unity-base-field__input > .message_field_header__label {
+    margin-left: 3px;
+}
+
+.message_field_header__notnull > .unity-base-field__input > #unity-checkmark {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 auto;
+    align-self: center;
+    background-image: resource('uipackageresources/images/d_in_foldout.png');
+}
+
+.message_field_header__notnull > .unity-base-field__input:checked > #unity-checkmark {
+    background-image: resource('uipackageresources/images/d_in_foldout_on.png');
+}
+
+.message_field_header__control {
+    flex-grow: 1;
+    align-items: flex-end;
+}
+
+.message_field_header__control > .unity-button {
+    margin-left: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 2px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0 0 0 0;
+    width: 16px;
+    height: 16px;
+}
+
+.message_field_header__notnull > .message_field_header__control > .unity-button {
+    display: none;
+}
+
+.message_field_header__notnull:checked > .message_field_header__control > .unity-button {
+    display: flex;
+}
+
+.unity-base-field__inspector-field{
+    margin-right: 0px;
+}
+
+RepeatedField > Foldout > Toggle {
+    margin-left: -14px;
+}

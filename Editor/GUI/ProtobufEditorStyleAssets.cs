@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 namespace VisualProtobuf.UIElements
 {
@@ -11,7 +12,6 @@ namespace VisualProtobuf.UIElements
         const string kIconFolder = "d_Folder Icon";
         const string kIconFolderEmpty = "d_FolderEmpty Icon";
         const string kIconFolderOpened = "d_FolderOpened Icon";
-
 
         [InitializeOnLoadMethod]
         static void Initialize()

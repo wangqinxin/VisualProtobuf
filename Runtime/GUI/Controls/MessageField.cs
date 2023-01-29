@@ -1,71 +1,220 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
+using System;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using UnityEngine.UIElements;
 
 namespace VisualProtobuf.UIElements
 {
     public class MessageField : VisualElement, IProtobufField
     {
+        public static readonly string ussClassName = "unity-base-field";
+        public static readonly string labelUssClassName = ussClassName + "__label";
+        public static readonly string messageFieldUssClassName = "message_field";
+        public static readonly string messageFieldContainerUssClassName = messageFieldUssClassName + "_container";
+
         public FieldDescriptor Descriptor { get; set; }
         public IMessage Message { get; set; }
+        public Action<object, object> OnValueChanged { get; set; }
+        private MessageFieldHeader m_FieldHeader;
 
-        public MessageField(IMessage message, FieldDescriptor descriptor)
+        VisualElement m_ContentContainer;
+
+        public MessageField(IMessage message, FieldDescriptor descriptor = null)
         {
             Descriptor = descriptor;
             Message = message;
 
-            var fields = descriptor.MessageType.Fields;
-            foreach (var fieldDesc in fields.InFieldNumberOrder())
+            RegisterCallback<ChangeEvent<IMessage>>(OnFieldValueChanged);
+
+            AddToClassList(ussClassName);
+            AddToClassList(messageFieldUssClassName);
+            style.flexDirection = FlexDirection.Column;
+
+            RebuildUI();
+        }
+
+        void RebuildUI()
+        {
+            Clear();
+
+            if (Descriptor == null)
             {
-                Add(CreateFieldGUI(fieldDesc, message));
+                if (Message == null) return;
+                CreateFieldUI(this, Message.Descriptor, Message);
+                return;
+            }
+
+            if (Descriptor.HasValue<IMessage>(Message))
+            {
+                CreateNotNullValueUI();
+            }
+            else
+            {
+                CreateNullValueUI();
             }
         }
 
-        public MessageField(IMessage message)
+        void CreateNullValueUI()
         {
-            Message = message;
+            m_FieldHeader = new MessageFieldHeader(Descriptor.GetDisplayName());
+            m_FieldHeader.SetValueIsNull(true);
+            Add(m_FieldHeader);
 
-            var fields = Message.Descriptor.Fields;
-            foreach (var fieldDesc in fields.InFieldNumberOrder())
+            var createButton = new Button();
+            createButton.style.backgroundImage = ProtobufStyleAssets.Active.IconAdd;
+            createButton.RegisterCallback<ClickEvent>(OnClickCreateMessage);
+            m_FieldHeader.AddControlElement(createButton);
+        }
+
+        void CreateNotNullValueUI()
+        {
+            m_FieldHeader = new MessageFieldHeader(Descriptor.GetDisplayName());
+            m_FieldHeader.SetValueIsNull(false);
+            m_FieldHeader.SetValueWithoutNotify(true); //TODO message default value
+            m_FieldHeader.RegisterCallback<ChangeEvent<bool>>(OnFieldHeaderChecked);
+            Add(m_FieldHeader);
+
+            var deleteButton = new Button();
+            deleteButton.style.backgroundImage = ProtobufStyleAssets.Active.IconDelete;
+            deleteButton.RegisterCallback<ClickEvent>(OnClickDeleteMessage);
+            m_FieldHeader.AddControlElement(deleteButton);
+
+            CreateMessageContentUI(m_FieldHeader.value);
+        }
+
+        void OnFieldHeaderChecked(ChangeEvent<bool> changeEvent)
+        {
+            CreateMessageContentUI(changeEvent.newValue);
+        }
+
+        void CreateMessageContentUI(bool display)
+        {
+            if (display)
             {
-                Add(CreateFieldGUI(fieldDesc, message));
+                if (m_ContentContainer == null)
+                {
+                    var message = Descriptor.GetValue<IMessage>(Message);
+                    if (message == null) return;
+
+                    m_ContentContainer = new VisualElement();
+                    m_ContentContainer.AddToClassList(messageFieldContainerUssClassName);
+                    Add(m_ContentContainer);
+
+                    CreateFieldUI(m_ContentContainer, Descriptor.MessageType, message);
+                }
+                Add(m_ContentContainer);
+            }
+            else
+            {
+                if (m_ContentContainer != null)
+                    Remove(m_ContentContainer);
             }
         }
 
-        VisualElement CreateFieldGUI(FieldDescriptor descriptor, IMessage message)
+        void OnClickCreateMessage(ClickEvent clickEvent)
         {
-            switch (descriptor.FieldType)
+            var msg = ProtobufDatabase.CreateMessage(Descriptor.MessageType);
+            Descriptor.SetValue(Message, msg);
+
+            using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
+            evt.target = parent;
+            SendEvent(evt);
+
+            RebuildUI();
+        }
+
+        void OnClickDeleteMessage(ClickEvent clickEvent)
+        {
+            Descriptor.SetValue<IMessage>(Message, null);
+
+            using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
+            evt.target = parent;
+            SendEvent(evt);
+
+            RebuildUI();
+        }
+
+        void CreateFieldUI(VisualElement fieldRootElement, MessageDescriptor messageDescriptor, IMessage message)
+        {
+            var fields = messageDescriptor.Fields;
+            foreach (var fieldDesc in fields.InFieldNumberOrder())
             {
-                case FieldType.Double:
-                    return new DoubleField(message, descriptor);
-                case FieldType.Float:
-                    return new FloatField(message, descriptor);
-                case FieldType.Int32:
-                case FieldType.SInt32:
-                case FieldType.SFixed32:
-                    return new IntField(message, descriptor);
-                case FieldType.Int64:
-                case FieldType.SInt64:
-                case FieldType.SFixed64:
-                    return new LongField(message, descriptor);
-                case FieldType.UInt32:
-                case FieldType.Fixed32:
-                    return new UintField(message, descriptor);
-                case FieldType.UInt64:
-                case FieldType.Fixed64:
-                    return new UlongField(message, descriptor);
-                case FieldType.Bool:
-                    return new BoolField(message, descriptor);
-                case FieldType.String:
-                    return new StringField(message, descriptor);
-                case FieldType.Enum:
-                    return new EnumField(message, descriptor);
-                //case FieldType.Message:
-                //    return new MessageField(message, descriptor);
-                default: return null;
+                fieldRootElement.Add(InstanceFieldHelpers.CreateFieldElement(fieldDesc, message));
+            }
+        }
+
+
+        void OnFieldValueChanged(ChangeEvent<IMessage> changeEvent)
+        {
+            if (OnValueChanged != null)
+                OnValueChanged.Invoke(changeEvent.previousValue, changeEvent.newValue);
+
+            changeEvent.StopPropagation();
+
+            using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
+            evt.target = parent;
+            SendEvent(evt);
+        }
+
+        public void SetValue(object value, bool notify)
+        {
+            if (value is IMessage message)
+            {
+                Message = message;
+                RebuildUI();
+            }
+        }
+
+        public object GetValue()
+        {
+            return Message;
+        }
+
+        public void SetLabel(string label)
+        {
+            if (m_FieldHeader != null) m_FieldHeader.label = label;
+        }
+
+        class MessageFieldHeader : BaseBoolField
+        {
+            public static readonly string messageFieldHeaderUssClassName = messageFieldUssClassName + "_header";
+            public static readonly string headerCheckmarkUssClassName = messageFieldHeaderUssClassName + "__checkmark";
+            public static readonly string headerLabelUssClassName = messageFieldHeaderUssClassName + "__label";
+            public static readonly string messageFieldNullHeaderUssClassName = messageFieldHeaderUssClassName + "__notnull";
+            public static readonly string messageFieldControlUssClassName = messageFieldHeaderUssClassName + "__control";
+
+            internal VisualElement m_ControlElement;
+
+            public MessageFieldHeader(string label) : base(null)
+            {
+                text = label;
+
+                AddToClassList(messageFieldHeaderUssClassName);
+
+                m_ControlElement = new VisualElement();
+                m_ControlElement.AddToClassList(messageFieldControlUssClassName);
+
+                m_CheckMark.AddToClassList(headerCheckmarkUssClassName);
+                Add(m_ControlElement);
+            }
+
+            protected override void InitLabel()
+            {
+                base.InitLabel();
+                m_Label.AddToClassList(headerLabelUssClassName);
+            }
+
+            internal void AddControlElement(VisualElement element)
+            {
+                m_ControlElement.Add(element);
+            }
+
+            internal void SetValueIsNull(bool isNull)
+            {
+                if (isNull)
+                    RemoveFromClassList(messageFieldNullHeaderUssClassName);
+                else
+                    AddToClassList(messageFieldNullHeaderUssClassName);
             }
         }
     }

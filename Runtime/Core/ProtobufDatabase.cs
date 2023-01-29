@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Google.Protobuf;
 using Google.Protobuf.Reflection;
 
 namespace VisualProtobuf
@@ -67,6 +68,17 @@ namespace VisualProtobuf
             if (msgDescs == null) return null;
             if (msgDescs.Count == 0) return null;
             return msgDescs[0];
+        }
+
+        public static IMessage CreateMessage(MessageDescriptor msgDescriptor, TextReader textReader = null)
+        {
+            if (msgDescriptor.Parser == null)
+            {
+                var dynamicMessage = new DynamicMessage(msgDescriptor);
+                dynamicMessage.ParseJson(textReader);
+                return dynamicMessage;
+            }
+            return msgDescriptor.Parser.ParseJson(textReader);
         }
 
 #if UNITY_EDITOR

@@ -5,3 +5,7 @@
 .unity-toolbar-button:active {
     background-color: rgb(70, 96, 124);
 }
+
+.unity-tree-view__item-toggle{
+    margin-right: 0px;
+}

@@ -13,15 +13,19 @@ namespace VisualProtobuf.UIElements
 
         public IMessage Message { get; set; }
 
+        public System.Action<object, object> OnValueChanged { get; set; }
+
+        private BaseField<T> m_BaseField;
+
         public NumberBaseField(IMessage message, FieldDescriptor descriptor)
         {
             Message = message;
             Descriptor = descriptor;
-            var field = CreateFiled();
-            field.label = Descriptor.Name;
-            field.value = GetValue();
-            field.RegisterCallback<ChangeEvent<T>>(OnValueChanged);
-            Add(field);
+            m_BaseField = CreateFiled();
+            m_BaseField.label = Descriptor.GetDisplayName();
+            m_BaseField.value = GetValue();
+            m_BaseField.RegisterCallback<ChangeEvent<T>>(OnFieldValueChanged);
+            Add(m_BaseField);
         }
 
         protected virtual BaseField<T> CreateFiled()
@@ -34,20 +38,54 @@ namespace VisualProtobuf.UIElements
             return Descriptor.GetValue<T>(Message);
         }
 
+        protected virtual bool Validate(T val)
+        {
+            return true;
+        }
+
         protected virtual void SetValue(T val)
         {
             Descriptor.SetValue(Message, val);
         }
 
-        void OnValueChanged(ChangeEvent<T> changeEvent)
+        void OnFieldValueChanged(ChangeEvent<T> changeEvent)
         {
-            SetValue(changeEvent.newValue);
-
-            using (var evt = ChangeEvent<IMessage>.GetPooled(Message, Message))
+            if (!Validate(changeEvent.newValue))
             {
-                evt.target = this;
-                SendEvent(evt);
+                m_BaseField.SetValueWithoutNotify(changeEvent.previousValue);
+                return;
             }
+            if (OnValueChanged != null)
+                OnValueChanged.Invoke(changeEvent.previousValue, changeEvent.newValue);
+            else
+                SetValue(changeEvent.newValue);
+
+            changeEvent.StopPropagation();
+
+            using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
+            evt.target = parent;
+            SendEvent(evt);
+        }
+
+        public void SetLabel(string label)
+        {
+            m_BaseField.label = label;
+        }
+
+        public void SetValue(object value,bool notify)
+        {
+            if (value is T val)
+            {
+                if (notify)
+                    m_BaseField.value = val;
+                else
+                    m_BaseField.SetValueWithoutNotify(val);
+            }
+        }
+
+        object IProtobufField.GetValue()
+        {
+            return m_BaseField.value;
         }
     }
 
@@ -85,7 +123,7 @@ namespace VisualProtobuf.UIElements
 
         protected override BaseField<int> CreateFiled()
         {
-            return new UnityEngine.UIElements.IntegerField();
+            return new IntegerField();
         }
     }
 
@@ -118,6 +156,11 @@ namespace VisualProtobuf.UIElements
         {
             Descriptor.SetValue<uint>(Message, System.Convert.ToUInt32(val));
         }
+
+        protected override bool Validate(long val)
+        {
+            return val >= uint.MinValue && val <= uint.MaxValue;
+        }
     }
 
 
@@ -136,6 +179,11 @@ namespace VisualProtobuf.UIElements
         protected override void SetValue(long val)
         {
             Descriptor.SetValue<ulong>(Message, System.Convert.ToUInt64(val));
+        }
+
+        protected override bool Validate(long val)
+        {
+            return val >= (long)ulong.MinValue && val <= long.MaxValue;
         }
     }
 

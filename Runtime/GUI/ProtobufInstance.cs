@@ -24,15 +24,42 @@ namespace VisualProtobuf.UIElements
 
         public string syntax;
 
-        public ProtobufInstanceType type;
+        [SerializeField]
+        private string typeName;
 
         public string messageType;
+
+        private ProtobufInstanceType? m_MetaType;
+
+        public ProtobufInstanceType MetaType
+        {
+            get
+            {
+                if (!m_MetaType.HasValue)
+                {
+                    if (System.Enum.TryParse(typeof(ProtobufInstanceType), typeName, out var enumObj))
+                    {
+                        m_MetaType = (ProtobufInstanceType)enumObj;
+                    }
+                    else
+                    {
+                        m_MetaType = ProtobufInstanceType.Single;
+                    }
+                }
+                return m_MetaType.Value;
+            }
+            set
+            {
+                m_MetaType = value;
+                typeName = value.ToString();
+            }
+        }
 
         public ProtobufInstanceMeta(ProtobufInstanceType type)
         {
             guid = System.Guid.NewGuid().ToString();
             syntax = "proto3";
-            this.type = type;
+            MetaType = type;
         }
 
         public static ProtobufInstanceMeta FromJson(string json)
@@ -103,7 +130,7 @@ namespace VisualProtobuf.UIElements
 
         public ProtobufInstanceMeta Duplicate()
         {
-            var meta = new ProtobufInstanceMeta(type)
+            var meta = new ProtobufInstanceMeta(MetaType)
             {
                 messageType = messageType
             };
