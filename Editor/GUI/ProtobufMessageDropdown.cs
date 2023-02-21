@@ -22,7 +22,9 @@ namespace VisualProtobuf.UIElements
         {
             var root = new ProtobufMessageDropdownItem("ProtobufMessage");
 
-            var messageTypes = ProtobufDatabase.GetMessageTypes();
+            var messageTypes = ProtobufDatabase.GetMessageTypes((msgDesc) => {
+                return msgDesc.IsSchema();    
+            });
             foreach (var msgType in messageTypes)
             {
                 root.AddChildByFullName(msgType.FullName);

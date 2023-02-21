@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using VisualProtobuf.Extensions;
 
 namespace VisualProtobuf
 {
@@ -52,7 +53,7 @@ namespace VisualProtobuf
         public static void ReloadSchemas()
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            m_ProtobufDescriptor = new ProtobufDescriptor(SchemaRootPath);
+            m_ProtobufDescriptor = new ProtobufDescriptor(SchemaRootPath, new OptionsExtensionSet());
             stopwatch.Stop();
             Debug.Log($"Load proto success, total {m_ProtobufDescriptor.Files.Count} files,use {stopwatch.ElapsedMilliseconds} ms.");
         }

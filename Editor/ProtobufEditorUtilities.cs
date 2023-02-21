@@ -14,9 +14,9 @@ namespace VisualProtobuf
         {
             string args = rootPath;
             if (line > 0)
-                args += $" -g '{filePath}:{line}'";
+                args += $" -g \"{filePath}:{line}\"";
             else
-                args += $" '{filePath}'";
+                args += $" \"{filePath}\"";
             if (reuse)
             {
                 args += " -r ";

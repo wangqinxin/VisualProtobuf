@@ -18,11 +18,13 @@ namespace VisualProtobuf.UIElements
             Message = message;
             Descriptor = descriptor;
             label = Descriptor.GetDisplayName();
+            var displayTooltip = descriptor.GetDisplayTooltip();
+            if (!string.IsNullOrEmpty(displayTooltip)) tooltip = displayTooltip;
 
             choices = new List<string>();
             foreach (var enumValue in descriptor.EnumType.Values)
             {
-                choices.Add(enumValue.Name);
+                choices.Add(enumValue.GetDisplayName());
             }
 
             index = Descriptor.GetValue<int>(message);

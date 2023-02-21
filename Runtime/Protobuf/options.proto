@@ -3,6 +3,6 @@ syntax = "proto2";
 import "google/protobuf/descriptor.proto";
 option csharp_namespace = "VisualProtobuf.Extensions";
 
-extend google.protobuf.MessageOptions {
-  optional string my_option = 51234;
+extend google.protobuf.FieldOptions {
+  optional string field_option_string = 10001;
 }

@@ -39,7 +39,8 @@ namespace VisualProtobuf.UIElements
 
         VisualElement CreateConfigGUI()
         {
-            return new ProtobufInstanceEditorView();
+            return new ProtobufMainEditorView();
+            //return new ProtobufInstanceEditorView();
         }
     }
 }

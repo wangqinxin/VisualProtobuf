@@ -33,9 +33,15 @@ namespace VisualProtobuf
             return fieldDescriptor.Accessor.HasValue(message);
         }
 
-        public static string GetDisplayName(this FieldDescriptor fieldDescriptor)
+        public static string GetDisplayName(this IDescriptor descriptor)
         {
-            return UnderscoresToCamelCase(fieldDescriptor.Name, true, false);
+            return descriptor.GetName(LanguageCode.ZH_CN);
+            return UnderscoresToCamelCase(descriptor.Name, true, false);
+        }
+
+        public static string GetDisplayTooltip(this IDescriptor descriptor)
+        {
+            return descriptor.GetTooltip(LanguageCode.ZH_CN);
         }
 
         public static object GetDefaultSingularValue(this FieldDescriptor fieldDescriptor)

@@ -18,6 +18,8 @@ namespace VisualProtobuf.UIElements
             Message = message;
             Descriptor = descriptor;
             label = Descriptor.GetDisplayName();
+            var displayTooltip = descriptor.GetDisplayTooltip();
+            if (!string.IsNullOrEmpty(displayTooltip)) tooltip = displayTooltip;
             value = Descriptor.GetValue<string>(message);
             labelElement.RegisterCallback<ChangeEvent<string>>(OnLabelValueChanged);
             RegisterCallback<ChangeEvent<string>>(OnFieldValueChanged);

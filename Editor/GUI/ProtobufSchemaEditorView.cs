@@ -23,10 +23,20 @@ namespace VisualProtobuf.UIElements
             title.style.unityFontStyleAndWeight = fontStyle;
             header.Add(title);
 
+            var genCodeBtn = new Button();
+            genCodeBtn.text = "GenerateCode";
+            genCodeBtn.RegisterCallback<ClickEvent>(OnClickGenerateCode);
+            header.Add(genCodeBtn);
+
             var toolbar = new ProtobufToolbar();
             toolbar.AppendAddMenuAction("Add Schema", (action) => { });
             header.Add(toolbar);
             return header;
+        }
+
+        void OnClickGenerateCode(ClickEvent clickEvent)
+        {
+            ProtobufDatabase.ReloadSchemas();
         }
     }
 }

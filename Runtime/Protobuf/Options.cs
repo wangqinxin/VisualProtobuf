@@ -25,19 +25,20 @@ namespace VisualProtobuf.Extensions {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cg1vcHRpb25zLnByb3RvGiBnb29nbGUvcHJvdG9idWYvZGVzY3JpcHRvci5w",
-            "cm90bzo0CglteV9vcHRpb24SHy5nb29nbGUucHJvdG9idWYuTWVzc2FnZU9w",
-            "dGlvbnMYopADIAEoCUIcqgIZVmlzdWFsUHJvdG9idWYuRXh0ZW5zaW9ucw=="));
+            "cm90bzo7ChNmaWVsZF9vcHRpb25fc3RyaW5nEh0uZ29vZ2xlLnByb3RvYnVm",
+            "LkZpZWxkT3B0aW9ucxiRTiABKAlCHKoCGVZpc3VhbFByb3RvYnVmLkV4dGVu",
+            "c2lvbnM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(null, new pb::Extension[] { OptionsExtensions.MyOption }, null));
+          new pbr::GeneratedClrTypeInfo(null, new pb::Extension[] { OptionsExtensions.FieldOptionString }, null));
     }
     #endregion
 
   }
   /// <summary>Holder for extension identifiers generated from the top level of options.proto</summary>
   public static partial class OptionsExtensions {
-    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, string> MyOption =
-      new pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, string>(51234, pb::FieldCodec.ForString(409874, ""));
+    public static readonly pb::Extension<global::Google.Protobuf.Reflection.FieldOptions, string> FieldOptionString =
+      new pb::Extension<global::Google.Protobuf.Reflection.FieldOptions, string>(10001, pb::FieldCodec.ForString(80010, ""));
   }
 
 }

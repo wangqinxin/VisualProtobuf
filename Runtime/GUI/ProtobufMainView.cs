@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Google.Protobuf.Reflection;
+using VisualProtobuf.Extensions;
 
 namespace VisualProtobuf.UIElements
 {
@@ -15,7 +16,7 @@ namespace VisualProtobuf.UIElements
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
             m_EditMode = editMode;
-
+            
             Add(CreateView());
         }
 

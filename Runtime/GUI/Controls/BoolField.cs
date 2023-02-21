@@ -26,9 +26,12 @@ namespace VisualProtobuf.UIElements
 
         public BoolField(IMessage message, FieldDescriptor descriptor) : this(descriptor.GetDisplayName())
         {
+            var displayTooltip = descriptor.GetDisplayTooltip();
+            if (!string.IsNullOrEmpty(displayTooltip)) tooltip = displayTooltip;
+
             Message = message;
             Descriptor = descriptor;
-
+            
             AddToClassList(ussClassName);
             m_CheckMark.AddToClassList(checkmarkUssClassName);
             m_CheckMark.parent.AddToClassList(inputUssClassName);
