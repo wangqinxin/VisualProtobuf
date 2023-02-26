@@ -7,15 +7,18 @@ using Google.Protobuf.Reflection;
 
 namespace VisualProtobuf.UIElements
 {
-    public class BoolField : BaseBoolField, IProtobufField
+    public class BoolField : BaseBoolField, IProtobufVisualField
     {
         public new static readonly string ussClassName = "bool_field";
         public new static readonly string inputUssClassName = ussClassName + "__input";
         public static readonly string checkmarkUssClassName = ussClassName + "__checkmark";
 
         public FieldDescriptor Descriptor { get; set; }
-
         public IMessage Message { get; set; }
+        public IProtobufVisualRoot Root { get; set; }
+        public IProtobufVisualField Parent { get; set; }
+        public string FieldPath { get; set; }
+        public HashSet<string> AssociatedFields { get; set; }
 
         public System.Action<object, object> OnValueChanged { get; set; }
 
@@ -46,6 +49,8 @@ namespace VisualProtobuf.UIElements
                 OnValueChanged.Invoke(changeEvent.previousValue, changeEvent.newValue);
             else
                 Descriptor.SetValue(Message, changeEvent.newValue);
+
+            this.OnPostValueChanged();
 
             using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
             evt.target = parent;

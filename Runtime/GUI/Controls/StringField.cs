@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Google.Protobuf;
@@ -5,11 +6,14 @@ using Google.Protobuf.Reflection;
 
 namespace VisualProtobuf.UIElements
 {
-    public class StringField : TextField, IProtobufField
+    public class StringField : TextField, IProtobufVisualField
     {
         public FieldDescriptor Descriptor { get; set; }
-
         public IMessage Message { get; set; }
+        public IProtobufVisualRoot Root { get; set; }
+        public IProtobufVisualField Parent { get; set; }
+        public HashSet<string> AssociatedFields { get; set; }
+        public string FieldPath { get; set; }
 
         public System.Action<object, object> OnValueChanged { get; set; }
 
@@ -36,6 +40,8 @@ namespace VisualProtobuf.UIElements
                 OnValueChanged.Invoke(changeEvent.previousValue, changeEvent.newValue);
             else
                 Descriptor.SetValue(Message, changeEvent.newValue);
+
+            this.OnPostValueChanged();
 
             changeEvent.StopPropagation();
 

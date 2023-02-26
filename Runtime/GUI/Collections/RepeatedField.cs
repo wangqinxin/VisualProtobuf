@@ -53,7 +53,7 @@ namespace VisualProtobuf.UIElements
 
         void BindItem(VisualElement element, int index)
         {
-            if (element is IProtobufField field)
+            if (element is IProtobufVisualField field)
             {
                 field.SetLabel("Element" + index);
                 field.SetValue(itemsSource[index], false);

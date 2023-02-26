@@ -4,14 +4,18 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using VisualProtobuf.Condition;
 
 namespace VisualProtobuf.UIElements
 {
-    public abstract class NumberBaseField<T> : VisualElement, IProtobufField where T : struct, System.IComparable<T>
+    public abstract class NumberBaseField<T> : VisualElement, IProtobufVisualField where T : struct, System.IComparable<T>
     {
         public FieldDescriptor Descriptor { get; set; }
-
         public IMessage Message { get; set; }
+        public IProtobufVisualRoot Root { get; set; }
+        public IProtobufVisualField Parent { get; set; }
+        public HashSet<string> AssociatedFields { get; set; }
+        public string FieldPath { get; set; }
 
         private readonly T m_MinValue;
         public T MinValue => m_MinValue;
@@ -31,6 +35,7 @@ namespace VisualProtobuf.UIElements
         {
             Message = message;
             Descriptor = descriptor;
+
             TryGetValueRange(out m_MinValue, out m_MaxValue, out m_AsSlider);
 
             m_BaseField = CreateFiled();
@@ -39,6 +44,7 @@ namespace VisualProtobuf.UIElements
             if (!string.IsNullOrEmpty(displayTooltip)) m_BaseField.tooltip = displayTooltip;
             m_BaseField.value = GetValue();
             m_BaseField.RegisterCallback<ChangeEvent<T>>(OnFieldValueChanged);
+
             Add(m_BaseField);
         }
 
@@ -79,6 +85,8 @@ namespace VisualProtobuf.UIElements
             else
                 SetValue(changeEvent.newValue);
 
+            this.OnPostValueChanged();
+
             changeEvent.StopPropagation();
 
             using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
@@ -102,7 +110,7 @@ namespace VisualProtobuf.UIElements
             }
         }
 
-        object IProtobufField.GetValue()
+        object IProtobufVisualField.GetValue()
         {
             return m_BaseField.value;
         }

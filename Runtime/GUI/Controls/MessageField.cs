@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using UnityEngine.UIElements;
 
 namespace VisualProtobuf.UIElements
 {
-    public class MessageField : VisualElement, IProtobufField
+    public class MessageField : VisualElement, IProtobufVisualField
     {
         public static readonly string ussClassName = "unity-base-field";
         public static readonly string labelUssClassName = ussClassName + "__label";
@@ -14,10 +15,16 @@ namespace VisualProtobuf.UIElements
 
         public FieldDescriptor Descriptor { get; set; }
         public IMessage Message { get; set; }
+        public IProtobufVisualRoot Root { get; set; }
+        public IProtobufVisualField Parent { get; set; }
+        public HashSet<string> AssociatedFields { get; set; }
+        public string FieldPath { get; set; }
         public Action<object, object> OnValueChanged { get; set; }
         private MessageFieldHeader m_FieldHeader;
 
         VisualElement m_ContentContainer;
+
+
 
         public MessageField(IMessage message, FieldDescriptor descriptor = null)
         {
@@ -30,10 +37,9 @@ namespace VisualProtobuf.UIElements
             AddToClassList(messageFieldUssClassName);
             style.flexDirection = FlexDirection.Column;
 
-            RebuildUI();
         }
 
-        void RebuildUI()
+        internal void BuildUIElement()
         {
             Clear();
 
@@ -120,7 +126,7 @@ namespace VisualProtobuf.UIElements
             evt.target = parent;
             SendEvent(evt);
 
-            RebuildUI();
+            BuildUIElement();
         }
 
         void OnClickDeleteMessage(ClickEvent clickEvent)
@@ -131,7 +137,7 @@ namespace VisualProtobuf.UIElements
             evt.target = parent;
             SendEvent(evt);
 
-            RebuildUI();
+            BuildUIElement();
         }
 
         void CreateFieldUI(VisualElement fieldRootElement, MessageDescriptor messageDescriptor, IMessage message)
@@ -139,7 +145,7 @@ namespace VisualProtobuf.UIElements
             var fields = messageDescriptor.Fields;
             foreach (var fieldDesc in fields.InFieldNumberOrder())
             {
-                fieldRootElement.Add(InstanceFieldHelpers.CreateFieldElement(fieldDesc, message));
+                fieldRootElement.Add(InstanceFieldHelpers.CreateFieldElement(Root, this, fieldDesc, message));
             }
         }
 
@@ -151,6 +157,8 @@ namespace VisualProtobuf.UIElements
 
             changeEvent.StopPropagation();
 
+            this.OnPostValueChanged();
+
             using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
             evt.target = parent;
             SendEvent(evt);
@@ -161,7 +169,7 @@ namespace VisualProtobuf.UIElements
             if (value is IMessage message)
             {
                 Message = message;
-                RebuildUI();
+                BuildUIElement();
             }
         }
 

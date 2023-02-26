@@ -9,16 +9,70 @@ namespace VisualProtobuf.UIElements
 {
     public static class InstanceFieldHelpers
     {
-        internal static VisualElement CreateFieldElement(FieldDescriptor descriptor, IMessage message)
+        internal static string GetParentFieldPath(this IProtobufVisualField field)
         {
-            if (descriptor.IsRepeated)
+            return field.Parent == null ? "" : field.Parent.FieldPath;
+        }
+
+        internal static void BindAssociatedFields(this IProtobufVisualField field)
+        {
+            if (field.Descriptor.TryGetConditionExpression(out var logicExpression))
             {
-                return new RepeatedField(descriptor, message);
+                foreach (var variable in logicExpression.Variables)
+                {
+                    var variablePath = field.GetParentFieldPath() + "." + variable.Name;
+                    if (field.Root.TryGetVisualFieldByPath(variablePath, out var associatedField))
+                    {
+                        associatedField.AssociatedFields ??= new HashSet<string>();
+                        associatedField.AssociatedFields.Add(field.FieldPath);
+                    }
+                }
             }
-            else
+        }
+
+        internal static void OnPostValueChanged(this IProtobufVisualField field)
+        {
+            if (field.AssociatedFields == null || field.AssociatedFields.Count == 0) return;
+            foreach (var association in field.AssociatedFields)
             {
-                return CreateSingularFieldElement(descriptor, message);
+                if (field.Root.TryGetVisualFieldByPath(association, out var associatedField))
+                {
+                    associatedField.VerifyConditionResult();
+                }
             }
+        }
+
+        internal static void VerifyConditionResult(this IProtobufVisualField field)
+        {
+            if (field is VisualElement fieldElement)
+            {
+                var result = field.Descriptor.GetConditionResult(field.Message);
+                fieldElement.style.display = result ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+        }
+
+        internal static VisualElement CreateFieldElement(this IProtobufVisualRoot root, IProtobufVisualField parent, FieldDescriptor descriptor, IMessage message)
+        {
+            VisualElement fieldElement = descriptor.IsRepeated ?
+                new RepeatedField(descriptor, message) :
+                CreateSingularFieldElement(descriptor, message);
+
+            if (fieldElement is IProtobufVisualField field)
+            {
+                field.Parent = parent;
+                field.Root = root;
+                field.FieldPath = field.GetParentFieldPath() + "." + field.Descriptor.Name;
+                field.VerifyConditionResult();
+                root.RegisterVisualField(field);
+            }
+
+            // MessageField build elemetns after construct.
+            if (fieldElement is MessageField messageField)
+            {
+                messageField.BuildUIElement();
+            }
+
+            return fieldElement;
         }
 
         internal static VisualElement CreateSingularFieldElement(FieldDescriptor descriptor, IMessage message)

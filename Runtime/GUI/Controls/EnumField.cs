@@ -7,10 +7,14 @@ using Google.Protobuf.Reflection;
 
 namespace VisualProtobuf.UIElements
 {
-    public class EnumField : DropdownField, IProtobufField
+    public class EnumField : DropdownField, IProtobufVisualField
     {
         public FieldDescriptor Descriptor { get; set; }
         public IMessage Message { get; set; }
+        public IProtobufVisualRoot Root { get; set; }
+        public IProtobufVisualField Parent { get; set; }
+        public HashSet<string> AssociatedFields { get; set; }
+        public string FieldPath { get; set; }
         public System.Action<object, object> OnValueChanged { get; set; }
 
         public EnumField(IMessage message, FieldDescriptor descriptor)
@@ -45,6 +49,8 @@ namespace VisualProtobuf.UIElements
             }
             else
                 Descriptor.SetValue(Message, index);
+
+            this.OnPostValueChanged();
 
             using var evt = ChangeEvent<IMessage>.GetPooled(Message, Message);
             evt.target = parent;
